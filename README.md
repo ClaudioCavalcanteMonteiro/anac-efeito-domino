@@ -50,13 +50,22 @@ Descoberta | Evidência | Decisão
 ## Regras de negócio (camada silver)
 
 1. Ler todos os arquivos mensais por nome de coluna (`union_by_name`); `Codeshare` fica nulo nos meses em que não existe.
+
 2. Converter as datas de texto (`dd/mm/aaaa hh:mm`) para timestamp, tratando o texto literal `null`.
+
 3. Converter `Número de Assentos` = 0 em nulo (dado ausente, não ausência de assentos).
+
 4. Criar `eh_cargueiro` (tipos `C` ou `G`) e `eh_internacional` (tipos `I` ou `G`).
+
 5. Criar `qtd_parceiros_codeshare` a partir da lista da coluna `Codeshare`.
+
 6. Remover duplicatas exatas (todas as colunas iguais).
+
 7. Marcar `eh_substituido` em cancelamentos com um voo realizado da mesma companhia, origem, destino e partida prevista.
+
 8. Manter `Justificativa` e monitorar o preenchimento com um teste.
+
+9. Criar eh_voo_regular (verdadeiro quando codigo_di = '0') na silver. As análises de pontualidade e propagação usam só os voos regulares, na gold. Os outros continuam na silver, como os cargueiros.
 
 ## Limitações dos dados
 
