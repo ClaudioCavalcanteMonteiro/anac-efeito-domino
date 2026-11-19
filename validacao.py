@@ -151,3 +151,64 @@ con.sql("""
             SELECT DISTINCT * EXCLUDE (arquivo_origem) FROM stg_vra
         ))                                                        AS distintas_entre_arquivos
 """).show()
+
+# ============================================================
+# Regra 7: quantos cancelamentos foram substituídos?
+# ============================================================
+print("\n7. Cancelamentos substituídos (voos regulares de passageiros)")
+con.sql("""
+    WITH marcado AS (
+        SELECT
+            *,
+            bool_or(situacao_voo = 'REALIZADO') OVER (
+                PARTITION BY empresa_icao, origem_icao, destino_icao, partida_prevista
+            ) AS tem_gemeo_realizado
+        FROM silver_voos
+        WHERE partida_prevista IS NOT NULL
+          AND eh_voo_regular
+          AND NOT eh_cargueiro
+    )
+    SELECT
+        COUNT(*)                                                   AS voos,
+        COUNT(*) FILTER (WHERE situacao_voo = 'CANCELADO')         AS cancelados,
+        COUNT(*) FILTER (WHERE situacao_voo = 'CANCELADO'
+                           AND tem_gemeo_realizado)                AS substituidos,
+        ROUND(100.0 * cancelados / voos, 2)                        AS taxa_cancel_bruta,
+        ROUND(100.0 * (cancelados - substituidos)
+              / (voos - substituidos), 2)                          AS taxa_cancel_ajustada
+    FROM marcado
+""").show()
+
+
+# 7b. Conferência da coluna eh_substituido no silver_voos
+print("\n7b. Conferência do eh_substituido")
+con.sql("""
+    SELECT
+        COUNT(*) FILTER (WHERE eh_substituido)                            AS substituidos_total,
+        COUNT(*) FILTER (WHERE eh_substituido
+                           AND eh_voo_regular AND NOT eh_cargueiro)       AS substituidos_passageiros
+    FROM silver_voos
+""").show()
+
+
+# 7c. Que tipo de voo substituiu os cancelamentos regulares?
+print("\n7c. Tipo do voo substituto")
+con.sql("""
+    SELECT
+        r.eh_voo_regular   AS substituto_regular,
+        r.eh_cargueiro     AS substituto_cargueiro,
+        r.codigo_di        AS substituto_codigo_di,
+        COUNT(DISTINCT c.empresa_icao || c.numero_voo || c.partida_prevista) AS cancelados
+    FROM silver_voos AS c
+    JOIN silver_voos AS r
+      ON  r.empresa_icao     = c.empresa_icao
+      AND r.origem_icao      = c.origem_icao
+      AND r.destino_icao     = c.destino_icao
+      AND r.partida_prevista = c.partida_prevista
+      AND r.situacao_voo     = 'REALIZADO'
+    WHERE c.eh_substituido
+      AND c.eh_voo_regular
+      AND NOT c.eh_cargueiro
+    GROUP BY ALL
+    ORDER BY cancelados DESC
+""").show()

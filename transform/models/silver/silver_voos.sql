@@ -9,7 +9,13 @@ base as (
         *,
         -- O arquivo de origem tem a coluna Codeshare? (layout novo)
         bool_or(codeshare is not null)
-            over (partition by arquivo_origem)          as arquivo_tem_codeshare
+            over (partition by arquivo_origem)          as arquivo_tem_codeshare,
+        -- Existe voo realizado da mesma companhia, rota, horário previsto
+        -- e mesmo tipo (passageiros ou carga)?
+        bool_or(situacao_voo = 'REALIZADO')
+            over (partition by empresa_icao, origem_icao,
+                               destino_icao, partida_prevista,
+                               tipo_linha in ('C', 'G')) as tem_gemeo_realizado
     from sem_duplicatas
 )
 
@@ -57,6 +63,9 @@ select
     tipo_linha in ('C', 'G')                            as eh_cargueiro,           -- regra 4
     tipo_linha in ('I', 'G')                            as eh_internacional,       -- regra 4
     codigo_di = '0'                                     as eh_voo_regular,         -- regra 9
+    situacao_voo = 'CANCELADO'
+        and partida_prevista is not null
+        and tem_gemeo_realizado                         as eh_substituido,         -- regra 7
 
     -- Controle
     data_referencia,

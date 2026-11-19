@@ -25,6 +25,7 @@ Análise de atrasos de voos com dados abertos da ANAC (VRA – Voo Regular Ativo
 
 9. **Partida/chegada real** - Horário em que o voo de fato decolou ou pousou
 
+
 ## Principais descobertas da exploração
 
 Análise feita no arquivo de set/2026.
@@ -63,7 +64,7 @@ Descoberta | Evidência | Decisão
 
 6. Remover duplicatas exatas (todas as colunas iguais).
 
-7. Marcar `eh_substituido` em cancelamentos com um voo realizado da mesma companhia, origem, destino e partida prevista.
+7. Marcar `eh_substituido` em cancelamentos com um voo realizado da mesma companhia, origem, destino, partida prevista e mesmo tipo (passageiros ou carga). Inclui substituições por voos extras.
 
 8. Manter `Justificativa` e monitorar o preenchimento com um teste.
 
