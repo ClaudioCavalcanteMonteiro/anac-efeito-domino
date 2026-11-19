@@ -1,10 +1,16 @@
-with base as (
+with sem_duplicatas as (
+    -- Regra 6: remove linhas idênticas em todas as colunas
+    select distinct *
+    from {{ ref('stg_vra') }}
+),
+
+base as (
     select
         *,
         -- O arquivo de origem tem a coluna Codeshare? (layout novo)
         bool_or(codeshare is not null)
             over (partition by arquivo_origem)          as arquivo_tem_codeshare
-    from {{ ref('stg_vra') }}
+    from sem_duplicatas
 )
 
 select

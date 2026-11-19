@@ -137,3 +137,17 @@ con.sql("""
         )                                                    AS atraso_mediano_chegada_min
     FROM silver_voos
 """).show()
+
+
+# ============================================================
+# Regra 6: quantas duplicatas exatas existem?
+# ============================================================
+print("\n6. Duplicatas exatas")
+con.sql("""
+    SELECT
+        (SELECT COUNT(*) FROM stg_vra)                            AS total_linhas,
+        (SELECT COUNT(*) FROM (SELECT DISTINCT * FROM stg_vra))   AS distintas_por_arquivo,
+        (SELECT COUNT(*) FROM (
+            SELECT DISTINCT * EXCLUDE (arquivo_origem) FROM stg_vra
+        ))                                                        AS distintas_entre_arquivos
+""").show()
