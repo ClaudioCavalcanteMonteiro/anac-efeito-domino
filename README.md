@@ -37,6 +37,8 @@ Descoberta | Evidência | Decisão
 
 7. A pandemia aparece no volume de dados | O arquivo de abr/2020 tem ~90% menos dados que o de jan/2020 | Destaque na análise histórica
 
+8. A coluna `Referência` muda de formato junto com o layout | Layout antigo: `2020-01-01`; layout novo: `01/09/2026 00:00:00` | Conversão com `coalesce` dos dois formatos
+
 ## Regras de negócio (camada silver)
 
 1. Ler todos os arquivos mensais por nome de coluna (`union_by_name`); `Codeshare` fica nulo nos meses em que não existe.

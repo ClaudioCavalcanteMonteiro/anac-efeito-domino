@@ -42,7 +42,10 @@ select
     "Codeshare"                                     as codeshare,
 
     -- Controle
-    try_cast("Referência" as date)                  as mes_referencia,
+    coalesce(
+        try_cast("Referência" as date),                               -- layout antigo: 2020-01-01
+        try_strptime("Referência", '%d/%m/%Y %H:%M:%S')::date         -- layout novo: 01/09/2026 00:00:00
+    )                                               as data_referencia,
     filename                                        as arquivo_origem
 
 from fonte
