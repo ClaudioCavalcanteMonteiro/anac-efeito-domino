@@ -28,3 +28,57 @@ duckdb.sql("""
     QUALIFY row_number() OVER (PARTITION BY arquivo ORDER BY referencia_texto) <= 3
     ORDER BY arquivo
 """).show()
+
+
+# ============================================================
+#  2- Voos sem partida prevista
+# ============================================================
+
+# 2a. Por Código DI: algum código concentra os voos sem previsão?
+print("\n2a. Por Código DI")
+con.sql("""
+    SELECT
+        codigo_di,
+        COUNT(*)                                          AS voos,
+        COUNT(*) FILTER (WHERE partida_prevista IS NULL)  AS sem_prevista,
+        ROUND(100.0 * COUNT(*) FILTER (WHERE partida_prevista IS NULL)
+              / COUNT(*), 1)                              AS pct_sem_prevista
+    FROM stg_vra
+    GROUP BY ALL
+    ORDER BY voos DESC
+""").show()
+
+# 2b. Qual a situação desses voos?
+print("\n2b. Situação dos voos sem previsão")
+con.sql("""
+    SELECT
+        situacao_voo,
+        COUNT(*)                                          AS voos,
+        COUNT(*) FILTER (WHERE chegada_prevista IS NULL)  AS tambem_sem_chegada_prevista
+    FROM stg_vra
+    WHERE partida_prevista IS NULL
+    GROUP BY ALL
+    ORDER BY voos DESC
+""").show()
+
+# 2c. Voos não regulares por ano e por layout
+print("\n2c. Voos não regulares por ano")
+con.sql("""
+    SELECT
+        year(data_referencia)                                       AS ano,
+        codeshare_existe,
+        COUNT(*)                                                    AS voos,
+        COUNT(*) FILTER (WHERE codigo_di <> '0')                    AS nao_regulares,
+        ROUND(100.0 * COUNT(*) FILTER (WHERE codigo_di <> '0')
+              / COUNT(*), 1)                                        AS pct_nao_regulares
+    FROM (
+        SELECT *,
+               regexp_extract(arquivo_origem, 'VRA_(\\d{4}_\\d{2})', 1) IN
+                   ('2021_04','2021_05','2021_06','2021_08','2021_10')
+               OR arquivo_origem LIKE '%VRA_2020_%'                 AS layout_antigo,
+               NOT layout_antigo                                    AS codeshare_existe
+        FROM stg_vra
+    )
+    GROUP BY ALL
+    ORDER BY ano, codeshare_existe
+""").show()
