@@ -120,3 +120,20 @@ con.sql("""
     GROUP BY ALL
     ORDER BY hora
 """).show(max_rows=30)
+
+# ============================================================
+# Ponto 4: validação do silver_voos (etapa 4.1)
+# ============================================================
+print("\n4. Validação do silver_voos")
+con.sql("""
+    SELECT
+        COUNT(*)                                             AS linhas,
+        COUNT(*) FILTER (WHERE eh_voo_regular)               AS regulares,
+        COUNT(*) FILTER (WHERE eh_cargueiro)                 AS cargueiros,
+        COUNT(*) FILTER (WHERE assentos IS NULL)             AS assentos_nulos,
+        COUNT(*) FILTER (WHERE qtd_parceiros_codeshare IS NULL) AS codeshare_desconhecido,
+        median(atraso_chegada_min) FILTER (
+            WHERE eh_voo_regular AND NOT eh_cargueiro
+        )                                                    AS atraso_mediano_chegada_min
+    FROM silver_voos
+""").show()
