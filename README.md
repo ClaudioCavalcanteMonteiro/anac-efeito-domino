@@ -47,6 +47,8 @@ Descoberta | Evidência | Decisão
 
 8. A coluna `Referência` muda de formato junto com o layout | Layout antigo: `2020-01-01`; layout novo: `01/09/2026 00:00:00` | Conversão com `coalesce` dos dois formatos
 
+9. Os horários estão todos no fuso de Brasília, inclusive no exterior | Ida e volta com a mesma duração; vale de partidas entre 0h e 1h e pico às 8h e às 17h | Comparação direta de horários entre aeroportos, sem conversão de fuso
+
 ## Regras de negócio (camada silver)
 
 1. Ler todos os arquivos mensais por nome de coluna (`union_by_name`); `Codeshare` fica nulo nos meses em que não existe.

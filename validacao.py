@@ -82,3 +82,41 @@ con.sql("""
     GROUP BY ALL
     ORDER BY ano, codeshare_existe
 """).show()
+
+
+# ============================================================
+# Ponto 3: fuso horário dos horários
+# ============================================================
+print("\n3. Duração prevista: ida x volta")
+con.sql("""
+    SELECT
+        origem_icao || ' -> ' || destino_icao                          AS rota,
+        COUNT(*)                                                       AS voos,
+        median(date_diff('minute', partida_prevista, chegada_prevista)) AS duracao_prevista_min,
+        median(date_diff('minute', partida_real, chegada_real))        AS duracao_real_min
+    FROM stg_vra
+    WHERE codigo_di = '0'
+      AND situacao_voo = 'REALIZADO'
+      AND origem_icao || '-' || destino_icao IN (
+          'SBGR-SBEG', 'SBEG-SBGR',   -- Guarulhos <-> Manaus (1h de fuso)
+          'SBBR-SBRB', 'SBRB-SBBR',   -- Brasília <-> Rio Branco (2h de fuso)
+          'SBGR-SBBR', 'SBBR-SBGR',   -- Guarulhos <-> Brasília (controle: mesmo fuso)
+          'SBGR-LPPT', 'LPPT-SBGR'    -- Guarulhos <-> Lisboa (3h ou 4h de fuso)
+      )
+    GROUP BY ALL
+    ORDER BY rota
+""").show()
+
+# 3b. Em que horas os voos domésticos partem?
+print("\n3b. Voos domésticos regulares por hora de partida prevista")
+con.sql("""
+    SELECT
+        hour(partida_prevista)  AS hora,
+        COUNT(*)                AS voos,
+        bar(COUNT(*), 0, 400000, 40) AS grafico
+    FROM stg_vra
+    WHERE codigo_di = '0'
+      AND tipo_linha = 'N'
+    GROUP BY ALL
+    ORDER BY hora
+""").show(max_rows=30)
