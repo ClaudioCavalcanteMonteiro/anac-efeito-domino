@@ -2,14 +2,14 @@ import duckdb
 
 arquivo = "data/bronze/VRA_2026_09.csv"
 
-# Total de linhas do arquivo
+# Linhas do arquivo
 duckdb.sql(f"""
     SELECT COUNT(*) AS total_linhas
     FROM read_csv('{arquivo}', delim=';')
 """).show()
 
-# Pergunta 2: Justificativa preenchida
-# (escreva aqui)
+# Coluna Justificativa preenchida
+
 duckdb.sql(f"""
     SELECT 
         COUNT(*) AS total_linhas,
@@ -22,7 +22,7 @@ duckdb.sql(f"""
     FROM read_csv('{arquivo}', delim=';')
 """).show()
 
-# Bônus: valores de Situação Voo
+# Situação Voo
 duckdb.sql(f"""
     SELECT 
         "Situação Voo",
