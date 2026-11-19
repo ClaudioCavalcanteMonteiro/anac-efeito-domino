@@ -1,0 +1,12 @@
+name: anac
+version: "1.0.0"
+profile: anac
+
+model-paths: ["models"]
+
+models:
+  anac:
+    silver:
+      +materialized: table
+    gold:
+      +materialized: table

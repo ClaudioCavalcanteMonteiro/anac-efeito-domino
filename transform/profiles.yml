@@ -1,0 +1,7 @@
+anac:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/anac.duckdb
+      threads: 4
