@@ -8,13 +8,21 @@ Análise de atrasos de voos com dados abertos da ANAC (VRA – Voo Regular Ativo
 ### Siglas e termos
 
 1. **ANAC** - Agência Nacional de Aviação Civil, órgão que regula a aviação civil no Brasil e publica os dados
+
 2. **VRA** - Voo Regular Ativo, base mensal da ANAC com cada voo programado e realizado: horários previstos e reais, situação, companhia, aeroportos e aeronave
+
 3. **SIROS** - Sistema de Registro de Operações, portal da ANAC onde os arquivos do VRA são publicados
+
 4. **ICAO / OACI** - Organização da Aviação Civil Internacional, que define os códigos de 3 letras das companhias (ex.: `GLO` = Gol, `TAM` = LATAM Brasil, `AZU` = Azul) e de 4 letras dos aeroportos (ex.: `SBGR` = Guarulhos, `SBGL` = Galeão)
+
 5. **Codeshare** - Acordo em que outras companhias vendem assentos de um voo operado por uma parceira, com números de voo próprios
+
 6. **Tipo de linha** - Classificação do voo: `N` nacional de passageiros, `I` internacional de passageiros, `C` nacional cargueiro, `G` internacional cargueiro
+
 7. **Situação do voo** - Indica se o voo foi `REALIZADO` ou `CANCELADO`
+
 8. **Partida/chegada prevista** - Horário programado do voo
+
 9. **Partida/chegada real** - Horário em que o voo de fato decolou ou pousou
 
 ## Principais descobertas da exploração
